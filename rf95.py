@@ -225,12 +225,13 @@ RADIO_MODE_RX=4
 RADIO_MODE_CAD=5
 
 class RF95:
-    def __init__(self, cs=0, int_pin=25, reset_pin=None):
+    def __init__(self, cs=0, int_pin=25, reset_pin=None, led_pin=None):
         # init class
         self.spi = spidev.SpiDev()
         self.cs = cs
         self.int_pin = int_pin
         self.reset_pin = reset_pin
+        self.led_pin = led_pin
         self.mode = RADIO_MODE_INITIALISING
         self.buf=[]         # RX Buffer for interrupts
         self.buflen=0       # RX Buffer length
@@ -256,6 +257,9 @@ class RF95:
         if self.reset_pin != None:
             GPIO.setup(self.reset_pin, GPIO.OUT)
             GPIO.output(self.reset_pin, GPIO.HIGH)
+        # set led pin
+        if self.led_pin != None:
+            GPIO.setup(self.led_pin, GPIO.OUT)
         # wait for reset
         time.sleep(0.05)
 
@@ -301,11 +305,11 @@ class RF95:
             # We have received a message
             self.rx_good = self.rx_good + 1
             self.rx_buf_valid = True
+            self.flash_led()
             self.set_mode_idle()
-
-
         elif self.mode == RADIO_MODE_TX and irq_flags & TX_DONE:
             self.tx_good = self.tx_good + 1
+            self.flash_led()
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_CAD and irq_flags & CAD_DONE:
             self.cad = irq_flags & CAD_DETECTED
@@ -314,6 +318,11 @@ class RF95:
         self.spi_write(REG_12_IRQ_FLAGS, 0xff) # Clear all IRQ flags
 
 
+    def flash_led(self):
+        if self.led_pin != None:
+            GPIO.output(self.led_pin, GPIO.HIGH)
+            time.sleep(0.75)
+            GPIO.output(self.led_pin, GPIO.LOW)
 
     def spi_write(self, reg, data):
         self.spi.open(0,self.cs)
@@ -480,6 +489,9 @@ class RF95:
             GPIO.cleanup(self.reset_pin)
         if self.int_pin:
             GPIO.cleanup(self.int_pin)
+        if self.led_pin:
+            GPIO.output(self.led_pin, GPIO.LOW)
+            GPIO.cleanup(self.led_pin)
 
 # Example, send two strings and (uncomment to) receive and print a reply
 if __name__ == "__main__":
