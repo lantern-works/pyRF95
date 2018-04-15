@@ -407,7 +407,7 @@ class RF95:
         agc_auto = AGC_AUTO_OFF):
 
         self.spi_write(REG_1D_MODEM_CONFIG1, \
-            bandwidth | coding_rate | implicit_header)
+            bandwidth | coding_rate | imp_header)
         self.spi_write(REG_1E_MODEM_CONFIG2, \
             spreading_factor | continuous_tx | crc | timeout)
         self.spi_write(REG_26_MODEM_CONFIG3, \
