@@ -246,6 +246,8 @@ class RF95:
         # open SPI and initialize RF95
         self.spi.open(0,self.cs)
         self.spi.max_speed_hz = 488000
+        # set sleep mode and LoRa mode
+        self.spi_write(REG_01_OP_MODE, MODE_SLEEP | LONG_RANGE_MODE)
         self.spi.close()
 
         # set interrupt pin
@@ -263,8 +265,6 @@ class RF95:
         # wait for reset
         time.sleep(0.05)
 
-        # set sleep mode and LoRa mode
-        self.spi_write(REG_01_OP_MODE, MODE_SLEEP | LONG_RANGE_MODE)
         
         time.sleep(0.01)        
         # check if we are set
