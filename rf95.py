@@ -305,11 +305,10 @@ class RF95:
             # We have received a message
             self.rx_good = self.rx_good + 1
             self.rx_buf_valid = True
-            self.flash_led()
+            self.flash_led(1+self.buflen / 30)
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_TX and irq_flags & TX_DONE:
             self.tx_good = self.tx_good + 1
-            self.flash_led()
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_CAD and irq_flags & CAD_DONE:
             self.cad = irq_flags & CAD_DETECTED
@@ -318,11 +317,13 @@ class RF95:
         self.spi_write(REG_12_IRQ_FLAGS, 0xff) # Clear all IRQ flags
 
 
-    def flash_led(self):
+    def flash_led(self, duration = 0.15):
         if self.led_pin != None:
+            time.sleep(0.05)
             GPIO.output(self.led_pin, GPIO.HIGH)
-            time.sleep(0.75)
+            time.sleep(duration)
             GPIO.output(self.led_pin, GPIO.LOW)
+            time.sleep(0.05)
 
     def spi_write(self, reg, data):
         self.spi.open(0,self.cs)
@@ -441,7 +442,13 @@ class RF95:
         self.spi_write_data(REG_00_FIFO, data)
         self.spi_write(REG_22_PAYLOAD_LENGTH, len(data))
 
-                # put radio in TX mode
+
+        self.flash_led(1+len(data) / 30)
+        self.flash_led()
+        self.flash_led()
+        self.flash_led()
+
+        # put radio in TX mode
         self.set_mode_tx()
         return True
 
