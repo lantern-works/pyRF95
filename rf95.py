@@ -292,7 +292,6 @@ class RF95:
         elif self.mode == RADIO_MODE_RX and irq_flags & RX_DONE:
             # packet received
             length = self.spi_read(REG_13_RX_NB_BYTES)
-            print(length)
             # Reset the fifo read ptr to the beginning of the packet
             self.spi_write(REG_0D_FIFO_ADDR_PTR, self.spi_read(REG_10_FIFO_RX_CURRENT_ADDR))
             self.buf = self.spi_read_data(REG_00_FIFO, length)
