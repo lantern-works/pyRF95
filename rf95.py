@@ -208,10 +208,10 @@ PA_DAC_ENABLE=0x07
 MAX_MESSAGE_LEN=255
 
 # default params
-Bw125Cr45Sf128 = (0x72,   0x74,    0x00)
-Bw500Cr45Sf128 = (0x92,   0x74,    0x00)
-Bw31_25Cr48Sf512 = (0x48,   0x94,    0x00)
-Bw125Cr48Sf4096 = (0x78,   0xc4,    0x00)
+Bw125Cr45Sf128 = (0x72,   0x74,    0x00)     # Default medium range: Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
+Bw500Cr45Sf128 = (0x92,   0x74,    0x00)     # Fast+short range: Bw = 500 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on 
+Bw31_25Cr48Sf512 = (0x48,   0x94,    0x00)   # Slow+long range: Bw = 31.25 kHz, Cr = 4/8, Sf = 512chips/symbol, CRC on
+Bw125Cr48Sf4096 = (0x78,   0xc4,    0x00)    # Slow+long range: Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on
 
 # SPI
 SPI_WRITE_MASK=0x80
