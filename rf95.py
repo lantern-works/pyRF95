@@ -304,10 +304,12 @@ class RF95:
             # We have received a message
             self.rx_good = self.rx_good + 1
             self.rx_buf_valid = True
-            self.flash_led(1+self.buflen / 30)
+            self.flash_led(3)
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_TX and irq_flags & TX_DONE:
             self.tx_good = self.tx_good + 1
+            for x in range(0, 6):
+                self.flash_led()
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_CAD and irq_flags & CAD_DONE:
             self.cad = irq_flags & CAD_DETECTED
@@ -441,11 +443,6 @@ class RF95:
         self.spi_write_data(REG_00_FIFO, data)
         self.spi_write(REG_22_PAYLOAD_LENGTH, len(data))
 
-
-        self.flash_led(1+len(data) / 30)
-        self.flash_led()
-        self.flash_led()
-        self.flash_led()
 
         # put radio in TX mode
         self.set_mode_tx()
