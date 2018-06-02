@@ -288,6 +288,7 @@ class RF95:
         # set led pin
         if self.led_pin != None:
             GPIO.setup(self.led_pin, GPIO.OUT)
+            GPIO.output(self.led_pin, GPIO.LOW)
         # wait for reset
         time.sleep(0.05)
 
@@ -330,12 +331,9 @@ class RF95:
             # We have received a message
             self.rx_good = self.rx_good + 1
             self.rx_buf_valid = True
-            self.flash_led(3)
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_TX and irq_flags & TX_DONE:
             self.tx_good = self.tx_good + 1
-            for x in range(0, 6):
-                self.flash_led()
             self.set_mode_idle()
         elif self.mode == RADIO_MODE_CAD and irq_flags & CAD_DONE:
             self.cad = irq_flags & CAD_DETECTED
@@ -343,13 +341,18 @@ class RF95:
     
         self.spi_write(REG_12_IRQ_FLAGS, 0xff) # Clear all IRQ flags
 
+    def led_on(self):
+        GPIO.output(self.led_pin, GPIO.HIGH)
+
+    def led_off(self):
+        GPIO.output(self.led_pin, GPIO.LOW)
 
     def flash_led(self, duration = 0.15):
         if self.led_pin != None:
             time.sleep(0.05)
-            GPIO.output(self.led_pin, GPIO.HIGH)
+            self.led_on()
             time.sleep(duration)
-            GPIO.output(self.led_pin, GPIO.LOW)
+            self.led_off()
             time.sleep(0.05)
 
     def spi_write(self, reg, data):
@@ -468,7 +471,6 @@ class RF95:
         # write data
         self.spi_write_data(REG_00_FIFO, data)
         self.spi_write(REG_22_PAYLOAD_LENGTH, len(data))
-
 
         # put radio in TX mode
         self.set_mode_tx()
